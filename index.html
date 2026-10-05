@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday - Search</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#4285f4; --red:#ea4335; --yellow:#fbbc05; --green:#34a853;
+  --bg:#ffffff; --text:#202124; --muted:#5f6368; --link:#1a0dab; --url:#202124;
+  --border:#dfe1e5; --chip:#f1f3f4; --panel:#ffffff; --hover:#f8f9fa; --footer:#f2f2f2;
+  --shadow:0 1px 6px rgba(32,33,36,.28);
+  --sans:"Roboto",Arial,"Helvetica Neue",sans-serif;
+  --logo:"Outfit","Product Sans","Trebuchet MS",Arial,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#202124; --text:#e8eaed; --muted:#9aa0a6; --link:#8ab4f8; --url:#bdc1c6;
+    --border:#5f6368; --chip:#303134; --panel:#202124; --hover:#303134; --footer:#171717;
+    --shadow:0 1px 6px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#202124; --text:#e8eaed; --muted:#9aa0a6; --link:#8ab4f8; --url:#bdc1c6;
+  --border:#5f6368; --chip:#303134; --panel:#202124; --hover:#303134; --footer:#171717;
+  --shadow:0 1px 6px rgba(0,0,0,.6);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;min-height:100%;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.hidden{display:none !important}
+
+/* ---------- logo ---------- */
+.logo{font-family:var(--logo);font-weight:500;letter-spacing:-.04em;line-height:1;white-space:nowrap;cursor:pointer;background:none;border:0;padding:0}
+.logo span:nth-child(6n+1){color:var(--blue)} .logo span:nth-child(6n+2){color:var(--red)}
+.logo span:nth-child(6n+3){color:var(--yellow)} .logo span:nth-child(6n+4){color:var(--blue)}
+.logo span:nth-child(6n+5){color:var(--green)} .logo span:nth-child(6n+6){color:var(--red)}
+
+/* ---------- search box ---------- */
+.sbox{position:relative;width:100%}
+.sbar{display:flex;align-items:center;height:46px;border:1px solid var(--border);border-radius:24px;background:var(--panel);padding:0 14px;gap:10px;transition:box-shadow .15s}
+.sbar:hover,.sbox.open .sbar{box-shadow:var(--shadow);border-color:transparent}
+.sbox.open .sbar{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.sbar input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:16px var(--sans)}
+.sbar svg{flex:none;fill:var(--muted)}
+.sbar .mic{background:none;border:0;padding:0;display:flex}
+.sbar .mic svg path:nth-child(1){fill:#4285f4}.sbar .mic svg path:nth-child(2){fill:#34a853}.sbar .mic svg path:nth-child(3){fill:#fbbc05}.sbar .mic svg path:nth-child(4){fill:#ea4335}
+.sug{position:absolute;left:0;right:0;top:100%;background:var(--panel);box-shadow:var(--shadow);border-radius:0 0 24px 24px;padding:6px 0 14px;z-index:20;border-top:1px solid var(--border);margin:0;list-style:none}
+.sug li{display:flex;gap:14px;align-items:center;padding:7px 16px;cursor:pointer;font-size:16px}
+.sug li:hover,.sug li.sel{background:var(--hover)}
+.sug svg{fill:var(--muted);flex:none}
+
+/* ---------- home ---------- */
+#home{flex:1;display:flex;flex-direction:column}
+.topbar{display:flex;justify-content:flex-end;align-items:center;gap:18px;padding:14px 20px}
+.topbar button.link{background:none;border:0;color:var(--text);font-size:13px;padding:6px}
+.topbar button.link:hover{text-decoration:underline}
+.avatar{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:500;background:var(--blue);border:2px solid var(--panel);box-shadow:0 0 0 2px var(--yellow);font-size:14px}
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 20px 8vh;gap:26px}
+.hero .logo{font-size:var(--logo-size,88px);max-width:100%}
+.hero .sbox{max-width:584px}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn{background:var(--chip);border:1px solid var(--chip);border-radius:4px;padding:0 16px;height:36px;color:var(--text);font-size:14px}
+.btn:hover{border-color:var(--border);box-shadow:0 1px 1px rgba(0,0,0,.15)}
+.offered{color:var(--muted);font-size:13px;text-align:center;line-height:1.8}
+.offered b{font-weight:400;color:var(--link);cursor:default}
+footer{background:var(--footer);color:var(--muted);font-size:14px;border-top:1px solid var(--border)}
+footer .row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 24px}
+
+/* ---------- results ---------- */
+#results{flex:1}
+.rhead{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:15;border-bottom:1px solid var(--border)}
+.rtop{display:flex;align-items:center;gap:24px;padding:16px 20px 0 24px;flex-wrap:wrap}
+.rtop .logo{font-size:30px}
+.rtop .sbox{max-width:690px;flex:1;min-width:220px}
+.rtop .avatar{margin-left:auto}
+.tabs{display:flex;gap:6px;padding:8px 20px 0 24px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:3px solid transparent;padding:10px 12px 9px;color:var(--muted);font-size:14px;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.rbody{display:flex;gap:56px;padding:6px 20px 60px 24px;align-items:flex-start;max-width:1180px}
+.col{flex:1;min-width:0;max-width:652px}
+.panelcol{width:380px;flex:none;margin-top:18px}
+.stats{color:var(--muted);font-size:14px;margin:12px 0 4px}
+.dym{font-size:16px;margin:0 0 18px}
+.dym i{color:var(--red)} .dym a{color:var(--link);font-style:italic;font-weight:500;cursor:pointer}
+.dym a:hover{text-decoration:underline}
+.res{margin:0 0 28px}
+.res .site{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.fav{width:26px;height:26px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:13px;flex:none;border:1px solid var(--border)}
+.site .n{font-size:14px;line-height:1.3;color:var(--text)}
+.site .u{font-size:12px;color:var(--url);line-height:1.3;opacity:.85}
+.res h3{margin:4px 0 3px;font-weight:400;font-size:20px;line-height:1.3}
+.res h3 button{background:none;border:0;padding:0;text-align:left;color:var(--link);font-size:inherit}
+.res h3 button:hover{text-decoration:underline}
+.res p{margin:0;color:var(--muted);font-size:14px;line-height:1.58}
+.res p b{color:var(--text);font-weight:500}
+.full{margin-top:10px;padding:12px 14px;border-left:3px solid var(--blue);background:var(--hover);border-radius:0 8px 8px 0;color:var(--text);line-height:1.6;font-size:14.5px;animation:open .2s ease-out}
+@keyframes open{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.ad{margin:0 0 26px}
+.ad .tag{font-weight:700;font-size:13px;color:var(--text)}
+.paa{border:1px solid var(--border);border-radius:8px;margin:0 0 28px}
+.paa h4{margin:0;padding:14px 16px 6px;font-weight:500;font-size:18px}
+.paa details{border-top:1px solid var(--border);padding:0 16px}
+.paa details:first-of-type{border-top:0}
+.paa summary{list-style:none;cursor:pointer;padding:13px 0;display:flex;justify-content:space-between;gap:12px;font-size:15px}
+.paa summary::-webkit-details-marker{display:none}
+.paa summary::after{content:"";width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);margin:5px 4px 0 0;flex:none;transition:transform .15s}
+.paa details[open] summary::after{transform:rotate(-135deg);margin-top:9px}
+.paa .ans{padding:0 0 16px;color:var(--muted);line-height:1.6;font-size:14px}
+.kp{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--panel)}
+.kp .banner{height:92px;background:linear-gradient(90deg,var(--blue) 0 25%,var(--red) 25% 50%,var(--yellow) 50% 75%,var(--green) 75%)}
+.kp .in{padding:0 18px 18px;margin-top:-34px}
+.kp .big{width:68px;height:68px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font:500 32px var(--logo);color:var(--blue);border:4px solid var(--panel);box-shadow:0 0 0 1px var(--border)}
+.kp h2{margin:10px 0 0;font-size:26px;font-weight:400;line-height:1.2}
+.kp .sub{color:var(--muted);margin:2px 0 12px}
+.kp .desc{line-height:1.6;margin:0 0 14px}
+.kp dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:6px 12px;line-height:1.5}
+.kp dt{font-weight:500}.kp dd{margin:0;color:var(--text)}
+.kp .actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.pill{border:1px solid var(--border);background:var(--panel);border-radius:18px;height:34px;padding:0 14px;color:var(--link)}
+.pill:hover{background:var(--hover)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-top:18px}
+.tile{border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--panel)}
+.tile .img{aspect-ratio:4/3;display:grid;place-items:center;font-size:44px}
+.tile .cap{padding:8px 10px 10px;font-size:13px;line-height:1.4}
+.tile .cap small{display:block;color:var(--muted);font-size:12px}
+.place{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.place .pin{width:40px;height:40px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-size:20px;flex:none}
+.place b{font-weight:500;font-size:16px;color:var(--link)}
+.place .st{color:#e37400;letter-spacing:1px;font-size:13px}
+.place p{margin:2px 0 0;color:var(--muted);line-height:1.5}
+.news{padding:16px 0;border-bottom:1px solid var(--border)}
+.news .src{font-size:12px;color:var(--muted);margin-bottom:4px}
+.news b{font-size:18px;font-weight:500;line-height:1.35;display:block}
+.news p{margin:4px 0 0;color:var(--muted);line-height:1.5}
+
+.tile.ph{padding:0;text-align:left;cursor:zoom-in;color:var(--text)}
+.tile.ph img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:55;display:grid;place-items:center;padding:20px;animation:fade .2s}
+.lb figure{margin:0;max-width:min(920px,100%);text-align:center;color:#fff}
+.lb img{max-width:100%;max-height:78vh;border-radius:8px}
+.lb figcaption{margin-top:10px;font-size:15px}
+/* ---------- photos ---------- */
+.grid{display:block;column-width:190px;column-gap:14px}
+.tile{break-inside:avoid;margin-bottom:14px}
+.tile.ph img{aspect-ratio:auto}
+.kp .banner{height:112px;background:center 45%/cover;border-bottom:4px solid;border-image:linear-gradient(90deg,var(--blue) 25%,var(--red) 0 50%,var(--yellow) 0 75%,var(--green) 0) 1}
+.kp .big{overflow:hidden;padding:0}.kp .big img{width:100%;height:100%;object-fit:cover}
+.lb{gap:8px;grid-template-columns:auto minmax(0,1fr) auto}
+.lb figcaption small{display:block;opacity:.7;font-size:13px;margin-top:3px}
+.lbn{background:rgba(255,255,255,.14);border:0;color:#fff;width:42px;height:42px;border-radius:50%;font-size:26px;line-height:1}
+.lbn:hover{background:rgba(255,255,255,.28)}
+.cardph{display:block;width:150px;margin:-8px auto 14px;border-radius:6px;border:6px solid #fff;border-bottom-width:22px;box-shadow:0 4px 14px rgba(0,0,0,.25);transform:rotate(-3deg)}
+@media (max-width:560px){.lbn{width:34px;height:34px}}
+/* ---------- lucky card ---------- */
+.overlay{position:fixed;inset:0;background:rgba(32,33,36,.62);z-index:50;display:grid;place-items:center;padding:20px;animation:fade .2s}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.card{background:var(--panel);color:var(--text);border-radius:20px;max-width:440px;width:100%;padding:34px 28px 26px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.35);max-height:90vh;overflow:auto}
+.card .cake{font-size:64px;line-height:1;cursor:pointer;background:none;border:0;display:inline-block;transition:transform .15s}
+.card .cake:active{transform:scale(.9) rotate(-6deg)}
+.card h2{margin:12px 0 4px;font:500 30px/1.15 var(--logo);letter-spacing:-.02em}
+.card h2 span:nth-child(4n+1){color:var(--blue)}
+.card .msg{line-height:1.7;font-size:16px;margin:12px 0 4px;white-space:pre-line}
+.card .sig{color:var(--muted);margin:14px 0 20px}
+.card .hint{color:var(--muted);font-size:12px;margin-top:10px}
+.solid{background:var(--blue);color:#fff;border:0;border-radius:20px;height:40px;padding:0 22px;font-weight:500}
+.solid:hover{filter:brightness(1.08)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60;width:100%;height:100%}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#323232;color:#fff;padding:12px 18px;border-radius:8px;z-index:70;font-size:14px;animation:fade .2s;max-width:90vw}
+
+/* ---------- edit panel (only with #edit) ---------- */
+#edit{position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:80;background:var(--panel);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:12px;width:260px;font-size:13px}
+#edit label{display:block;margin:8px 0 3px;color:var(--muted)}
+#edit input,#edit textarea{width:100%;border:1px solid var(--border);background:var(--bg);color:var(--text);border-radius:6px;padding:7px 8px;font:14px var(--sans)}
+#edit b{font-weight:500}
+
+@media (max-width:900px){
+  .rbody{flex-direction:column;gap:8px}
+  .panelcol{width:100%;order:-1;margin-top:12px}
+  .col{max-width:none;width:100%}
+}
+@media (max-width:560px){
+  .topbar{padding:10px 14px}
+  .rtop{gap:12px;padding:12px 14px 0}
+  .rtop .sbox{order:3;flex-basis:100%}
+  .tabs{padding-left:10px}
+  .rbody{padding-left:16px;padding-right:16px}
+  footer .row{padding:12px 16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div id="home">
+  <div class="topbar">
+    <button class="link" id="lnkMem">Memories</button>
+    <button class="link" id="lnkPlaces">Places</button>
+    <div class="avatar" id="avHome" aria-hidden="true">A</div>
+  </div>
+  <main class="hero">
+    <button class="logo" id="logoHome" aria-label="Birthday search home"></button>
+    <div class="sbox" id="sboxHome"></div>
+    <div class="btns">
+      <button class="btn" id="btnSearch">Search</button>
+      <button class="btn" id="btnLucky">I'm Feeling Lucky</button>
+    </div>
+    <div class="offered" id="offered"></div>
+  </main>
+  <footer><div class="row"><span id="footL"></span><span>Happy birthday · 2 years together tomorrow</span></div></footer>
+</div>
+
+<!-- ============ RESULTS ============ -->
+<div id="results" class="hidden">
+  <header class="rhead">
+    <div class="rtop">
+      <button class="logo" id="logoRes" aria-label="Back to home"></button>
+      <div class="sbox" id="sboxRes"></div>
+      <div class="avatar" id="avRes" aria-hidden="true">A</div>
+    </div>
+    <nav class="tabs" role="tablist">
+      <button class="tab on" data-tab="all" role="tab">All</button>
+      <button class="tab" data-tab="images" role="tab">Images</button>
+      <button class="tab" data-tab="maps" role="tab">Maps</button>
+      <button class="tab" data-tab="news" role="tab">News</button>
+    </nav>
+  </header>
+  <div class="rbody">
+    <div class="col" id="colMain"></div>
+    <aside class="panelcol" id="kp"></aside>
+  </div>
+</div>
+
+<canvas id="confetti" class="hidden"></canvas>
+<div id="overlayRoot"></div>
+<div id="edit" class="hidden"></div>
+
+<script>
+/* ===================== CONTENT (edit me) ===================== */
+const DEFAULTS = {
+  name: "Picchuuuu",
+  real: "Ayush",
+  from: "Sagun",
+  age: "22",
+  msg: "Out of everything I've ever searched for, you're the best thing I found.\n\nWe met in college (a -1/10 place, but it gave me you), and somewhere between college and now you became my whole world. You confessed first, I proposed first, and I kissed you first, so I'd say we're even.\n\nThank you for staying so calm when I'm not, for working so hard for your dreams, and for being my goofy, cute cutu baby. You can be annoying sometimes, but I'd choose you over and over again.\n\nToday you turn 22, and tomorrow we complete 2 years together. And yes, I think about your kisses far more than a sensible person should. Happy birthday, my chotuuuu, piddii, picchuuu, pucchii, pucccchuuuu. I love you dearly."
+};
+const NICK = "cutu baby";
+const NICKS = "Ayush (real name), Chotuuuu, Piddii, Pucchii, Pucccchuuuu, Cutu baby";
+const LINK_AYUSH = "https://maps.app.goo.gl/iitHAKJjkbD67j6a8";
+const LINK_SAGUN = "https://maps.app.goo.gl/Fh9S8Vgw9EX7n8i6A";
+
+const SUGGESTIONS = [
+  "why is {name} so cute",
+  "who confessed first {name} or {from}",
+  "why is {name} so goofy",
+  "how old is {name} turning today",
+  "{name} and {from} anniversary",
+  "cake near me"
+];
+
+/* Each result: icon, site name, url path, title, snippet, long message revealed on click */
+const RESULTS = [
+  { ic:"📖", site:"Wikipedia", url:"https://en.wikipedia.org › wiki › {name}",
+    title:"{name} - Wikipedia",
+    snip:"<b>{name}</b> (born <b>Ayush</b>, also known as <b>Chotuuuu, Piddii, Pucchii</b>) is a 22-year-old ambitious, hardworking and very cute human, and {from}'s favorite person.",
+    full:"Early life: college, where he met {from}. Career: works at the same workplace as {from}, and works very hard at it. Personal life: in a relationship with {from}. Known for his calm, his goofiness and his kisses." },
+  { ic:"💬", site:"Reddit", url:"https://www.reddit.com › r › BestBoyfriends",
+    title:"r/BestBoyfriends: {name} has been crowned #1 (again)",
+    snip:"Moderators confirmed the result today. No recount was needed. <b>{from}</b> was asked for comment and said, \"obviously.\"",
+    full:"Top comment: \"Stays calm even when his girlfriend is not.\" 12k upvotes. Second comment: \"Dangerously good kisser.\" 15k upvotes. Awards: Gold, Silver, and one very big hug." },
+  { ic:"🔎", site:"Proof of Love", url:"https://www.proofoflove.com › who-confessed-first",
+    title:"Who confessed first? Who proposed first? The full investigation",
+    snip:"<b>{name} confessed first. {from} proposed first.</b> Both are guilty. Verdict: love, with no appeal possible.",
+    full:"Plot twist: they kissed before they were even dating, and {from} started it. Investigators report no regrets, no refunds, and a strong chance of more kisses." },
+  { ic:"❤️", site:"Healthline", url:"https://www.healthline.com › wellbeing › {name}",
+    title:"10 proven benefits of dating {name}",
+    snip:"His calm reduces {from}'s stress by 100%.* Known side effects: occasional annoyance and an extremely high kiss demand. <b>*Study conducted by {from}, n=1.</b>",
+    full:"Is he annoying sometimes? Yes. Would {from} choose him over and over again anyway? Also yes. Overall rating: worth it every single time." },
+  { ic:"💼", site:"LinkedIn", url:"https://www.linkedin.com › in › {name}",
+    title:"{name} - Ambitious. Hardworking. Cute. | LinkedIn",
+    snip:"Open to: kisses, cuddles and cake. Skills: hustle, patience, goofiness. <b>Endorsed by {from} (2 years).</b>",
+    full:"He works so hard for his goals, and {from} is proud of him every single day. Future role: whatever he dreams of. Current relationship status: very taken." },
+  { ic:"🎓", site:"Our Story", url:"https://www.ourstory.com › college-to-forever",
+    title:"From college to the workplace: the {name} & {from} story",
+    snip:"Met in college. Dating since. Now sharing an office, lunch breaks and a <b>2nd anniversary (tomorrow)</b>. Rated 5.0 ★★★★★.",
+    full:"It started in college, which is a -1/10 place, but it gave {from} him. Same college then, same company now, same favorite person every time. Two years down, and she'd choose him again in every one of them." },
+  { ic:"🎂", site:"Cake Weekly", url:"https://www.cakeweekly.com › birthday › {name}",
+    title:"How to celebrate {name}'s birthday: the complete guide",
+    snip:"Step one: cake. Step two: more cake. Step three: <b>{from}</b>, a big hug, and a very important anniversary tomorrow.",
+    full:"Pro tip: the birthday boy gets the biggest slice, first pick of the movie and unlimited forehead kisses. These rules are not up for debate." }
+];
+
+const PAA = [
+  ["Why is {name} the best boyfriend?", "Because he is ambitious, hardworking, calm and kind, and he loves {from} on her best days and her loudest ones."],
+  ["Who confessed first, {name} or {from}?", "{name} confessed first. {from} proposed first. And {from} started the first kiss. Nobody is keeping score."],
+  ["Is {name} a good kisser?", "Ask {from}. The official verdict is \"one more, please\", and the lipstick evidence backs it up."],
+  ["Is {name} annoying sometimes?", "Sometimes. {from} still chooses him over and over again."],
+  ["How long have {name} and {from} been together?", "Since college. Their 2nd anniversary is tomorrow."],
+  ["What should I get {name} for his birthday?", "Already done: a cake, a lot of kisses and this website."]
+];
+
+/* Each image: [emoji, caption, small text, background, src]. Add a src (photo) to show a real picture. */
+const IMAGES = [
+  ["📸","Window seat, your shoulder, my favourite flight","January 2026","","photos/plane.jpg"],
+  ["😊","That grin, and my hand squishing your cheek","3 October 2024","","photos/grin.jpg"],
+  ["🐙","An octopus on my head, pouty faces, zero regrets","June 2026","","photos/octopus.jpg"],
+  ["🌙","A campus night, your hand on my cheek, and the world went quiet","26 March 2025","","photos/campus-night.jpg"],
+  ["🪞","Mirror selfie, wrapped in your arms. I could stay here all day.","January 2026","","photos/mirror.jpg"],
+  ["💋","Exhibit A: lipstick evidence. No apologies.","28 April 2025","","photos/lipstick.jpg"],
+  ["🥂","Anniversary number one","6 October 2025","","photos/anniversary.jpg"],
+  ["❤️","Cheek to cheek, with a heart painted on mine","September 2024","","photos/cheeks.jpg"],
+  ["🖤","Matching in black, blowing you kisses","Polaroid","","photos/polaroid-black.jpg"],
+  ["🛺","A blurry, bumpy ride, still my favourite view","27 April 2025","","photos/auto-ride.jpg"],
+  ["🛍️","Arms crossed, matching smiles, shopping bags at our feet","1 August 2026","","photos/mall.jpg"]
+];
+
+/* [emoji, title, description, rating text, optional link] */
+const PLACES = [
+  ["🎓","KNIT Sultanpur","Where we first met. The place is a -1/10, but it gave me you.","-1/10 for the place, 5 ★ for what it gave me",""],
+  ["💼","Fun Republic Mall, Lucknow","Our office. Where we share lunch breaks and secret smiles across the room.","★★★★★",""],
+  ["🏠","{name}'s place","Rated 10/10 for cuddles. Open whenever {from} shows up.","★★★★★",LINK_AYUSH],
+  ["🏡","{from}'s place","Cozy, calm and always better with {name} in it.","★★★★★",LINK_SAGUN]
+];
+
+const NEWS = [
+  ["Birthday Times · just now","BREAKING: {name} turns {age}, the world celebrates","Reports say the mood is excellent and cake supplies are holding steady."],
+  ["Romance Daily · 12 min ago","He confessed first, she proposed first: experts call it a tie","Sources say she also started the first kiss. The case is closed."],
+  ["Evidence Weekly · 30 min ago","Lipstick marks found on his face, suspect refuses to apologise","Witnesses say the suspect would absolutely do it again."],
+  ["The Daily Hug · 40 min ago","{name} spotted being cute and goofy again, girlfriend chooses him anyway","Local boyfriend stays calm under pressure, sources say (again)."],
+  ["Anniversary Weekly · 1 hr ago","Alert: 2 years together tomorrow, experts say it's going great","Insiders report extreme passion, shared lunches and zero plans to stop."]
+];
+
+/* ===================== STATE & HELPERS ===================== */
+let S = { ...DEFAULTS };
+const EDIT = false;
+if (EDIT) { try { const s = localStorage.getItem("bday-site"); if (s) S = { ...S, ...JSON.parse(s) }; } catch (e) {} }
+
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fill = t => t.replace(/\{name\}/g, esc(S.name)).replace(/\{from\}/g, esc(S.from)).replace(/\{age\}/g, esc(S.age));
+const plain = t => t.replace(/\{name\}/g, S.name).replace(/\{from\}/g, S.from).replace(/\{age\}/g, S.age);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const ICON = {
+  search: '<svg width="20" height="20" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>',
+  mic: '<svg width="22" height="22" viewBox="0 0 24 24"><path d="m12 15 1.5-.2c1.1-.3 2-1.3 2-2.5V6c0-1.7-1.3-3-3-3S9 4.3 9 6v6.3c0 1.2.9 2.2 2 2.5L12 15z"/><path d="M17.3 11c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/><path d="M11 6v6.3c0 .5.2.9.6 1.2L12 15V3c-.6 0-1 .3-1 3z" opacity=".001"/><path d="M12 3v12" opacity=".001"/></svg>'
+};
+
+function toast(t) {
+  const el = document.createElement("div");
+  el.className = "toast"; el.textContent = t; el.setAttribute("role", "status");
+  document.body.appendChild(el); setTimeout(() => el.remove(), 2600);
+}
+
+/* ===================== LOGO + SEARCH BOX ===================== */
+function renderLogos() {
+  const letters = [...S.name].map(ch => `<span>${esc(ch)}</span>`).join("");
+  $("#logoHome").innerHTML = letters; $("#logoRes").innerHTML = letters;
+  const len = Math.max(S.name.length, 3);
+  const size = Math.max(44, Math.min(92, 520 / len * 1.5));
+  document.documentElement.style.setProperty("--logo-size", `min(${size}px, ${Math.floor(92 / len * 1.35)}vw)`);
+  const init = esc(S.name.trim().charAt(0).toUpperCase() || "A");
+  $("#avHome").textContent = init; $("#avRes").textContent = init;
+}
+
+function makeSearchBox(root, id) {
+  root.innerHTML = `
+    <div class="sbar" role="search">${ICON.search}
+      <input id="${id}" type="text" autocomplete="off" spellcheck="false" aria-label="Search" aria-autocomplete="list">
+      <button class="mic" type="button" aria-label="Search by voice">${ICON.mic}</button>
+    </div>
+    <ul class="sug hidden" role="listbox"></ul>`;
+  const input = $("input", root), list = $(".sug", root);
+  let sel = -1;
+  const items = () => [...list.children];
+  const open = () => {
+    list.innerHTML = SUGGESTIONS.map(s => `<li role="option">${ICON.search.replace('width="20" height="20"', 'width="18" height="18"')}<span>${esc(plain(s))}</span></li>`).join("");
+    list.classList.remove("hidden"); root.classList.add("open"); sel = -1;
+  };
+  const close = () => { list.classList.add("hidden"); root.classList.remove("open"); };
+  input.addEventListener("focus", () => { userTouched = true; open(); });
+  input.addEventListener("input", () => { userTouched = true; if (list.classList.contains("hidden")) open(); });
+  input.addEventListener("keydown", e => {
+    const li = items();
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (list.classList.contains("hidden")) open();
+      const n = li.length; sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + n + 1) % (n + 1);
+      if (sel === n) sel = -1;
+      li.forEach((x, i) => x.classList.toggle("sel", i === sel));
+      if (sel >= 0) input.value = li[sel].textContent;
+    } else if (e.key === "Enter") { e.preventDefault(); close(); doSearch(input.value); input.blur(); }
+    else if (e.key === "Escape") close();
+  });
+  list.addEventListener("mousedown", e => {
+    const li = e.target.closest("li"); if (!li) return;
+    e.preventDefault(); close(); doSearch(li.textContent);
+  });
+  $(".mic", root).addEventListener("click", () => { input.focus(); userTouched = false; toast("Listening... say \"happy birthday\""); typeInto(input, "happy birthday " + S.name); });
+  document.addEventListener("click", e => { if (!root.contains(e.target)) close(); });
+  return { input, close };
+}
+
+let userTouched = false, typing = false;
+function typeInto(input, text) {
+  if (typing) return;
+  typing = true; input.value = "";
+  let i = 0;
+  const tick = () => {
+    if (userTouched && i > 0 && input.value !== text.slice(0, i)) { typing = false; return; }
+    if (i <= text.length) { input.value = text.slice(0, i++); setTimeout(tick, 70 + Math.random() * 50); }
+    else typing = false;
+  };
+  tick();
+}
+
+/* ===================== RESULTS RENDERING ===================== */
+let activeTab = "all";
+
+function renderAll() {
+  const res = RESULTS.map((r, i) => `
+    <article class="res">
+      <div class="site"><div class="fav">${r.ic}</div><div><div class="n">${fill(r.site)}</div><div class="u">${fill(r.url)}</div></div></div>
+      <h3><button data-full="${i}" aria-expanded="false">${fill(r.title)}</button></h3>
+      <p>${fill(r.snip)}</p>
+      <div class="fullslot"></div>
+    </article>`);
+  const ad = `
+    <article class="ad">
+      <div class="site"><div class="fav">🍰</div><div><div class="n"><span class="tag">Sponsored</span> · Fresh Cake Co.</div><div class="u">https://www.freshcake.com › for-{name}</div></div></div>
+      <h3 style="margin:4px 0 3px;font-weight:400;font-size:20px;line-height:1.3"><span style="color:var(--link)">Birthday cake for {name} - skip the line</span></h3>
+      <p style="margin:0;color:var(--muted);line-height:1.58">Freshly made. Best eaten together with <b style="color:var(--text);font-weight:500">{from}</b>. Candles included, wishes sold separately.</p>
+    </article>`;
+  const paa = `
+    <section class="paa"><h4>People also ask</h4>
+      ${PAA.map(([q, a]) => `<details><summary>${fill(q)}</summary><div class="ans">${fill(a)}</div></details>`).join("")}
+    </section>`;
+  return fill(ad).replace(/\{name\}/g, esc(S.name)) + res.slice(0, 3).join("") + paa + res.slice(3).join("");
+}
+
+function renderImages() {
+  return `<div class="grid">${IMAGES.map(([e, c, sub, bg, src], i) => src
+    ? `<button class="tile ph" data-ph="${i}" aria-label="Open photo: ${esc(plain(c))}"><img src="${src}" alt="${esc(plain(c))}" loading="lazy"><div class="cap">${fill(c)}${sub ? `<small>${fill(sub)}</small>` : ""}</div></button>`
+    : `<div class="tile"><div class="img" style="background:${bg}">${e}</div><div class="cap">${fill(c)}${sub ? `<small>${fill(sub)}</small>` : ""}</div></div>`).join("")}</div>`;
+}
+function renderMaps() {
+  return `<div style="margin-top:14px">${PLACES.map(([e, t, d, r, url]) =>
+    `<div class="place"><div class="pin">${e}</div><div><b>${fill(t)}</b><div class="st">${esc(r)}</div><p>${fill(d)}</p>${url ? `<p><a href="${url}" target="_blank" rel="noopener" style="color:var(--link)">Open in Maps</a></p>` : ""}</div></div>`).join("")}</div>`;
+}
+function renderNews() {
+  return `<div>${NEWS.map(([s, h, d]) => `<div class="news"><div class="src">${fill(s)}</div><b>${fill(h)}</b><p>${fill(d)}</p></div>`).join("")}</div>`;
+}
+
+let lbI = 0;
+function openLB(i) {
+  lbI = (i + IMAGES.length) % IMAGES.length;
+  const im = IMAGES[lbI], root = $("#overlayRoot");
+  root.innerHTML = `<div class="lb" role="dialog" aria-modal="true"><button class="lbn" data-d="-1" aria-label="Previous photo">‹</button><figure><img src="${im[4]}" alt="${esc(plain(im[1]))}"><figcaption>${fill(im[1])}<small>${fill(im[2])}</small></figcaption></figure><button class="lbn" data-d="1" aria-label="Next photo">›</button></div>`;
+  const lb = $(".lb", root);
+  lb.addEventListener("click", e => { const n = e.target.closest(".lbn"); if (n) openLB(lbI + +n.dataset.d); else if (e.target.tagName !== "IMG") root.innerHTML = ""; });
+}
+document.addEventListener("keydown", e => { if ($(".lb")) { if (e.key === "ArrowRight") openLB(lbI + 1); if (e.key === "ArrowLeft") openLB(lbI - 1); } });
+
+function renderKP() {
+  const init = esc(S.name.trim().charAt(0).toUpperCase() || "A");
+  $("#kp").innerHTML = `
+    <div class="kp">
+      <div class="banner" style="background-image:url(photos/mall.jpg)"></div>
+      <div class="in">
+        <div class="big"><img src="photos/avatar.jpg" alt="${init}"></div>
+        <h2>${esc(S.name)}</h2>
+        <div class="sub">Boyfriend · Birthday boy</div>
+        <p class="desc">${esc(S.name)} is an ambitious, hardworking, very cute (and sometimes very goofy) human, and the boy ${esc(S.from)} fell for in college. Turning <b>${esc(S.age)}</b> today, with a 2nd anniversary tomorrow.</p>
+        <dl>
+          <dt>Real name:</dt><dd>Ayush</dd>
+          <dt>Also known as:</dt><dd>${esc(NICKS.replace("Ayush (real name), ",""))}</dd>
+          <dt>Age:</dt><dd>${esc(S.age)} (as of today)</dd>
+          <dt>Partner:</dt><dd>${esc(S.from)}</dd>
+          <dt>Met:</dt><dd>College</dd>
+          <dt>Works at:</dt><dd>Same workplace as ${esc(S.from)}</dd>
+          <dt>Confessed first:</dt><dd>${esc(S.name)}</dd>
+          <dt>Proposed first:</dt><dd>${esc(S.from)}</dd>
+          <dt>Known for:</dt><dd>Ambition, hard work, goofiness and kisses</dd>
+          <dt>Together:</dt><dd>2 years tomorrow</dd>
+        </dl>
+        <div class="actions">
+          <button class="pill" id="kpHug">Send a hug</button>
+          <button class="pill" id="kpLucky">Read my message</button>
+        </div>
+      </div>
+    </div>`;
+  $("#kpHug").onclick = () => { burst(); toast(`${S.from} sent you the biggest hug`); };
+  $("#kpLucky").onclick = showCard;
+}
+
+function renderTab() {
+  const main = $("#colMain");
+  const q = $("#qRes").value.trim();
+  const head = `<div class="stats">About 1,000,000,000 results (0.001 seconds)</div>
+    <p class="dym"><i>Did you mean:</i> <a id="dym">${esc(NICK)}</a></p>`;
+  main.innerHTML = head + ({ all: renderAll, images: renderImages, maps: renderMaps, news: renderNews }[activeTab])();
+  $("#kp").classList.toggle("hidden", activeTab !== "all");
+  document.querySelectorAll(".tab").forEach(t => { const on = t.dataset.tab === activeTab; t.classList.toggle("on", on); t.setAttribute("aria-selected", on); });
+  $("#dym").onclick = () => doSearch(NICK);
+  main.querySelectorAll("[data-ph]").forEach(b => b.addEventListener("click", () => openLB(+b.dataset.ph)));
+  main.querySelectorAll("[data-full]").forEach(b => b.addEventListener("click", () => {
+    const slot = b.closest(".res").querySelector(".fullslot");
+    const open = slot.innerHTML !== "";
+    slot.innerHTML = open ? "" : `<div class="full">${fill(RESULTS[b.dataset.full].full)}</div>`;
+    b.setAttribute("aria-expanded", String(!open));
+  }));
+}
+
+/* ===================== NAVIGATION ===================== */
+function doSearch(q, tab) {
+  q = (q || "").trim() || `happy birthday ${S.name}`;
+  activeTab = tab || "all";
+  $("#home").classList.add("hidden"); $("#results").classList.remove("hidden");
+  $("#qRes").value = q;
+  document.title = `${q} - Search`;
+  renderTab(); renderKP();
+  window.scrollTo(0, 0);
+}
+function goHome() {
+  $("#results").classList.add("hidden"); $("#home").classList.remove("hidden");
+  document.title = "Happy Birthday - Search";
+  $("#qHome").value = "";
+}
+
+/* ===================== LUCKY CARD + CONFETTI ===================== */
+function showCard() {
+  burst();
+  const nameHtml = [...S.name].map(c => `<span>${esc(c)}</span>`).join("");
+  const root = $("#overlayRoot");
+  root.innerHTML = `
+    <div class="overlay" role="dialog" aria-modal="true" aria-label="Birthday message">
+      <div class="card">
+        <img class="cardph" src="photos/polaroid-black.jpg" alt="">
+        <button class="cake" id="cake" aria-label="Blow out the candles">🎂</button>
+        <h2>Happy birthday, ${esc(S.name)}!</h2>
+        <div class="sig" style="margin:-4px 0 10px">(Ayush, to everyone else)</div>
+        <div class="msg">${esc(S.msg)}</div>
+        <div class="sig">Love, ${esc(S.from)}</div>
+        <button class="solid" id="wish">Make a wish</button>
+        <div class="hint">Tap the cake for more confetti</div>
+      </div>
+    </div>`;
+  const ov = $(".overlay", root);
+  $("#cake").onclick = burst;
+  $("#wish").onclick = () => { burst(); toast("Wish granted. No refunds."); setTimeout(() => root.innerHTML = "", 900); };
+  ov.addEventListener("click", e => { if (e.target === ov) root.innerHTML = ""; });
+  $("#wish").focus();
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("#overlayRoot").innerHTML = ""; });
+
+const cv = $("#confetti"), cx = cv.getContext("2d");
+let parts = [], raf = 0;
+function burst() {
+  if (reduce) return;
+  cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio;
+  cv.classList.remove("hidden");
+  const cols = ["#4285f4", "#ea4335", "#fbbc05", "#34a853"], W = cv.width, H = cv.height, d = devicePixelRatio;
+  for (let i = 0; i < 140; i++) parts.push({
+    x: W / 2 + (Math.random() - .5) * W * .3, y: H * .55,
+    vx: (Math.random() - .5) * 18 * d, vy: (-Math.random() * 18 - 6) * d,
+    s: (Math.random() * 7 + 5) * d, r: Math.random() * 6, vr: (Math.random() - .5) * .4,
+    c: cols[i % 4], life: 0
+  });
+  if (!raf) loop();
+}
+function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  const g = .5 * devicePixelRatio;
+  parts = parts.filter(p => p.y < cv.height + 30 && p.life < 220);
+  parts.forEach(p => {
+    p.vy += g; p.x += p.vx; p.y += p.vy; p.vx *= .99; p.r += p.vr; p.life++;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
+    cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore();
+  });
+  if (parts.length) raf = requestAnimationFrame(loop);
+  else { raf = 0; cv.classList.add("hidden"); }
+}
+
+/* ===================== EDIT PANEL (open the page with #edit) ===================== */
+function setupEdit() {
+  const p = $("#edit"); p.classList.remove("hidden");
+  p.innerHTML = `<b>Preview mode</b>
+    <label>His name</label><input id="eName" value="${esc(S.name)}">
+    <label>Your name</label><input id="eFrom" value="${esc(S.from)}">
+    <label>His age</label><input id="eAge" value="${esc(S.age)}">
+    <label>Birthday message</label><textarea id="eMsg" rows="5">${esc(S.msg)}</textarea>`;
+  const upd = () => {
+    S.name = $("#eName").value || "Alex"; S.from = $("#eFrom").value || "Sam";
+    S.age = $("#eAge").value || "25"; S.msg = $("#eMsg").value;
+    try { localStorage.setItem("bday-site", JSON.stringify(S)); } catch (e) {}
+    init(true);
+  };
+  ["#eName", "#eFrom", "#eAge", "#eMsg"].forEach(s => $(s).addEventListener("input", upd));
+}
+
+/* ===================== INIT ===================== */
+let homeBox, resBox, started = false;
+function init(rerender) {
+  renderLogos();
+  $("#offered").innerHTML = `Birthday edition is also offered in: <b>Cake</b> <b>Cuddles</b> <b>Kisses</b>`;
+  $("#footL").textContent = `Made with love by ${S.from}`;
+  if (!rerender) {
+    homeBox = makeSearchBox($("#sboxHome"), "qHome");
+    resBox = makeSearchBox($("#sboxRes"), "qRes");
+    $("#logoHome").onclick = goHome; $("#logoRes").onclick = goHome;
+    $("#btnSearch").onclick = () => doSearch($("#qHome").value);
+    $("#btnLucky").onclick = showCard;
+    $("#lnkMem").onclick = () => doSearch(`${S.name} memories`, "images");
+    $("#lnkPlaces").onclick = () => doSearch(`places with ${S.name}`, "maps");
+    document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => { activeTab = t.dataset.tab; renderTab(); }));
+  } else if (!$("#results").classList.contains("hidden")) { renderTab(); renderKP(); }
+}
+init(false);
+if (EDIT) setupEdit();
+
+/* one gentle moment on load: the search box types a query by itself */
+if (!reduce) setTimeout(() => { if (!userTouched && !EDIT) typeInto($("#qHome"), `happy birthday ${S.name}`); }, 1200);
+</script>
+</body>
+</html>
